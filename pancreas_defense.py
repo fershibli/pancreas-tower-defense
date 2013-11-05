@@ -12,18 +12,21 @@ fpsClock = pygame.time.Clock()
 rodando = True
 retangulo = pygame.Rect(0,0,40,40)
 quadrado = pygame.Rect(305,255,50,50)
+cubo_plano =  pygame.Rect(300,250,200,80)
 andar_esquerda = False
 andar_direita = False
 andar_baixo = False
 andar_cima = False
 abrir_menu = False
+comecar_jogo=False
 confirmar_compra = False
 aviso_texto = ''
-vida_pancreas=1000
+vida_pancreas=1002
 atp_grana=200
 tabuleiro_plataforma = []
 itens = []
 posicao_compra=1
+posicao_tela_inicial=1
 caminho_tortuoso=[[True,False,False,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True],[True,False,False,True,True,False,False,False,False,False,False,True,True,False,False,False,False,False,False,True],[True,False,False,True,True,False,False,False,False,False,False,True,True,False,False,False,False,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],[True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],
                   [True,False,False,False,False,False,False,True,True,False,False,True,True,False,False,True,True,False,False,True],
                   [True,False,False,False,False,False,False,True,True,False,False,False,False,False,False,True,True,False,False,True],
@@ -52,7 +55,7 @@ class anatelDefense(object):#torre celular de defesa huehuehuehe
             self.alcance=2
             caminho_tortuoso[int(retangulo.y/40)][int(retangulo.x/40)]='torre 1'
             self.quadrado=pygame.Rect(int(retangulo.x+1),int(retangulo.y+1),38,38)
-            self.imagem=pygame.image.load("torre1.jpg")
+            self.imagem=pygame.image.load("torre1.png")
             self.posicao=(int(retangulo.x+1),int(retangulo.y+1))
             self.cor=(0,0,0)
         if opcao==2:
@@ -62,7 +65,7 @@ class anatelDefense(object):#torre celular de defesa huehuehuehe
             self.alcance=3
             caminho_tortuoso[int(retangulo.y/40)][int(retangulo.x/40)]='torre 1'
             self.quadrado=pygame.Rect(int(retangulo.x+1),int(retangulo.y+1),38,38)
-            self.imagem=pygame.image.load("torre2.jpg")
+            self.imagem=pygame.image.load("torre2.png")
             self.posicao=(int(retangulo.x+1),int(retangulo.y+1))
             self.cor=(0,0,0)
         if opcao==3:
@@ -72,43 +75,147 @@ class anatelDefense(object):#torre celular de defesa huehuehuehe
             self.alcance=4
             caminho_tortuoso[int(retangulo.y/40)][int(retangulo.x/40)]='torre 1'
             self.quadrado=pygame.Rect(int(retangulo.x+1),int(retangulo.y+1),38,38)
-            self.imagem=pygame.image.load("torre3.jpg")
+            self.imagem=pygame.image.load("torre3.png")
             self.posicao=(int(retangulo.x+1),int(retangulo.y+1))
             self.cor=(0,0,0)
 class diabetesPudim(object):
-    def __init__(self,ataque,defesa,vida,velocidade,tamanho,cores,ordem=0):
+    def __init__(self,ataque,defesa,vida,velocidade,imagem,ordem=0):
         self.vida_atual=vida
         self.vida_total=vida
         self.defesa=defesa
         self.ataque=ataque
         self.padrao=(random.randrange(2)+1)
-        self.quadrado=pygame.Rect((40*self.padrao+int((40-tamanho)/2)),ordem*(-1),tamanho,tamanho)
+        self.imagem=pygame.image.load(imagem)
+        self.x=(40*self.padrao)
+        self.y=ordem*(-1)
         self.velocidade=velocidade+random.randrange(5)
         self.movimento=0
-        self.cor=cores
         self.desce=True
         self.direita=False
-DISPLAY.fill((255,200,0))
-pygame.display.set_caption('PANCREAS - TOWER DEFENSE (by:Pudim Games)')
-pygame.mouse.set_visible(0)
-DISPLAY.blit(pygame.font.SysFont("arial", 32).render("PÂNCREAS - TOWER DEFENSE",True,(0,0,0)),(200,200))
-DISPLAY.blit(pygame.font.SysFont("arial", 32).render("by: Pudim Games",True,(0,0,0)),(300,232))
-DISPLAY.blit(pygame.font.SysFont("arial", 32).render(" Defenda o seu pâncreas!",True,(0,0,0)),(250,264))
-pygame.display.update()
-time.sleep(2)
 pancreas=[]
 exercito=[]
 v=0
 d=0
 while rodando:
-    if vida_pancreas<100:
+    if vida_pancreas>=1002:
+        if vida_pancreas>=1003:
+            if comecar_jogo:
+                vida_pancreas=1002
+        else:
+            if andar_cima and posicao_tela_inicial>1:
+                cubo_plano.y-=80
+                posicao_tela_inicial-=1
+                andar_cima=False
+            if andar_baixo and posicao_tela_inicial<3:
+                cubo_plano.y+=80
+                posicao_tela_inicial+=1
+                andar_baixo=False
+            if comecar_jogo:
+                if posicao_tela_inicial==1:
+                    vida_pancreas-=1
+                if posicao_tela_inicial==2:
+                    vida_pancreas+=1
+                if posicao_tela_inicial==3:
+                    vida_pancreas+=2
+                comecar_jogo=False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                rodando = False
+            if event.type== KEYUP and event.key == K_ESCAPE:
+                rodando = False
+            if event.type == KEYUP:
+                if event.key == K_RETURN or event.key == K_SPACE:
+                    comecar_jogo = False
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN or event.key == K_SPACE:
+                    comecar_jogo = True
+            if vida_pancreas==1002:
+                if event.type == KEYDOWN:
+                    if event.key == K_LEFT or event.key == K_a:
+                        andar_cima = True
+                if event.type == KEYUP:
+                    if event.key == K_LEFT or event.key == K_a:
+                        andar_cima = False
+                if event.type == KEYUP:
+                    if event.key == K_RIGHT or event.key == K_d:
+                        andar_baixo = False
+                if event.type == KEYDOWN:
+                    if event.key == K_RIGHT or event.key == K_d:
+                        andar_baixo = True
+                if event.type == KEYUP:
+                    if event.key == K_UP or event.key == K_w:
+                        andar_cima = False
+                if event.type == KEYDOWN:
+                    if event.key == K_UP or event.key == K_w:
+                        andar_cima = True
+                if event.type == KEYUP:
+                    if event.key == K_DOWN or event.key == K_s:
+                        andar_baixo = False
+                if event.type == KEYDOWN:
+                    if event.key == K_DOWN or event.key == K_s:
+                        andar_baixo = True
+        DISPLAY.fill((255,255,255))
+        DISPLAY.blit((pygame.image.load('pancreas_defense.jpg')),(370,150))
+        pygame.display.set_icon(pygame.image.load('torre2.png'))
+        pygame.mouse.set_visible(0)
+        pygame.display.set_caption('PANCREAS - TOWER DEFENSE (by:Pudim Games)')
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("PÂNCREAS - TOWER DEFENSE",True,(0,0,0)),(200,50))
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("by: Pudim Games",True,(0,0,0)),(300,82))
+        if vida_pancreas==1004:
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Os açúcares, carboidratos e proteínas avançarão pela parte mais baixa.",True,(0,0,0)),(0,255))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Destrua-as e obtenha ATP antes que eles sobrecarreguem o órgão.",True,(0,0,0)),(0,335))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Posicione suas torres de defesa celular nas partes mais altas.",True,(0,0,0)),(0,415))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("O ATP obtido pode ser usado para contruir mais e mais torres!",True,(0,0,0)),(0,495))
+        if vida_pancreas==1003:
+            DISPLAY.blit((pygame.image.load('pudim_games.jpg')),(150,350))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Produtora:",True,(0,0,0)),(300,235))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Designer:",True,(0,0,0)),(300,315))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Artista:",True,(0,0,0)),(300,395))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Programador:",True,(0,0,0)),(300,475))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Maria Tereza Font Fernandes",True,(0,0,0)),(320,255))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Luiz Gustavo Pelatieri Teixeira",True,(0,0,0)),(320,335))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Josias Danny de Viveiro ",True,(0,0,0)),(320,415))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Fernando Luiz Neme Chibli",True,(0,0,0)),(320,495))
+        if vida_pancreas==1002:
+            DISPLAY.fill((random.randrange(256),random.randrange(256),random.randrange(256)),pygame.Rect(cubo_plano.x-5,cubo_plano.y-5,cubo_plano.width+10,cubo_plano.height+10))
+            DISPLAY.fill((255,255,255),cubo_plano)
+            DISPLAY.blit(pygame.font.SysFont("arial black", 40).render("JOGAR",True,(0,0,0)),(320,255))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 40).render("EQUIPE",True,(0,0,0)),(315,335))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 40).render("REGRAS",True,(0,0,0)),(308,415))
+        pygame.display.update()
+        fpsClock.tick(10)
+    elif vida_pancreas==1001:
+        if comecar_jogo:
+            vida_pancreas-=1
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                rodando = False
+            if event.type== KEYUP and event.key == K_ESCAPE:
+                rodando = False
+            if event.type == KEYUP:
+                if event.key == K_RETURN or event.key == K_SPACE:
+                    comecar_jogo = False
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN or event.key == K_SPACE:
+                    comecar_jogo = True
+        DISPLAY.fill((255,200,0))
+        pygame.display.set_icon(pygame.image.load('torre2.png'))
+        pygame.display.set_caption('PANCREAS - TOWER DEFENSE (by:Pudim Games)')
+        pygame.mouse.set_visible(0)
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("PÂNCREAS - TOWER DEFENSE",True,(0,0,0)),(200,200))
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("by: Pudim Games",True,(0,0,0)),(300,232))
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render(" Defenda o seu pâncreas!",True,(0,0,0)),(250,264))
+        pygame.display.update()
+        fpsClock.tick(int(FPS/2))
+    elif vida_pancreas<100:
         for event in pygame.event.get():
             if event.type == QUIT:
                 rodando = False
             if event.type== KEYUP and event.key == K_ESCAPE:
                 rodando = False
         DISPLAY.fill((random.randrange(156)+100,0,0))
-        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("SEU FIGADO JÁ ERA!",True,(0,0,0)),(260,280))
+        DISPLAY.blit(pygame.font.SysFont("arial", 32).render("SEU PÂNCREAS JÁ ERA!",True,(0,0,0)),(260,280))
+        pygame.display.set_icon(pygame.image.load('torre1.png'))
         pygame.display.set_caption('PANCREAS - TOWER DEFENSE (by:Pudim Games)')
         pygame.mouse.set_visible(0)
         pygame.display.update()
@@ -137,7 +244,7 @@ while rodando:
                             atp_grana-=500
                             aviso_texto= 'Criada a Torre tipo 3 por 500 ATP!'
                         else:
-                            aviso_texto= 'Seu figado não tem ATP o suficiente!'
+                            aviso_texto= 'Seu pâncreas não tem ATP o suficiente!'
                     else:
                         aviso_texto= 'Aqui não dá para colocar a Torre!'
                 if event.type== KEYUP and event.key == K_ESCAPE:
@@ -164,58 +271,66 @@ while rodando:
                     if event.key == K_RETURN or event.key == K_SPACE:
                         confirmar_compra = True
         else:
-            if d==5:
-                if v>100 and v<=200: exercito.append(diabetesPudim(5,0.1,50,8,5,(50,200,100)))
-                elif v>150 and v<=300: exercito.append(diabetesPudim(6,0.2,100,5,10,(0,220,80)))
-                elif v>350 and v<=500: exercito.append(diabetesPudim(7,0.3,150,4,13,(0,10,100)))
-                elif v>550 and v<=800: exercito.append(diabetesPudim(8,0.4,200,3,20,(0,0,250)))
-                elif v>850 and v<=1000: exercito.append(diabetesPudim(15,0.5,300,2,25,(100,10,100)))
-                elif v>1100 and v<=1600: exercito.append(diabetesPudim(25,0.7,400,1,30,(200,10,200)))
-                elif v>1700 and v<=1900: exercito.append(diabetesPudim(1,0.8,300,10,2,(140,120,0)))
-                elif v>2000 and v<=2200: exercito.append(diabetesPudim(1,0.9,300,8,3,(140,120,0)))
-                elif v>2300 and v<=2500: exercito.append(diabetesPudim(1,0.99,300,6,4,(140,120,0)))
-                elif v>2600 and v<=2800: exercito.append(diabetesPudim(2,0.999,300,4,5,(140,120,0)))
-                elif v>2900 and v<=3100: exercito.append(diabetesPudim(2,0.9999,300,2,6,(140,120,0)))
-                elif v>3200 and v<=3400: exercito.append(diabetesPudim(3,0.99999,300,1,7,(140,120,0)))
-                elif v>3600 and v<=4700: exercito.append(diabetesPudim(50,1.2,500,30,20,(255,220,0)))
-                elif v>4800 and v<=4900: exercito.append(diabetesPudim(80,1.5,50000,30,25,(255,220,0)))
-                elif v>5000 and v<=5100: exercito.append(diabetesPudim(130,1.8,100000,30,30,(255,220,0)))
-                elif v==5200: exercito.append(diabetesPudim(500,2,100000,30,40,(255,220,0)))
+            if d==5:#self,ataque,defesa,vida,velocidade,imagem,ordem=0
+                if v>100 and v<=200: exercito.append(diabetesPudim(5,0.1,150,6,'inimigo1.png'))
+                elif v>300 and v<=400: exercito.append(diabetesPudim(5,0.2,200,5,'inimigo2.png'))
+                elif v>500 and v<=600: exercito.append(diabetesPudim(5,0.5,280,4,'inimigo3.png'))
+                elif v>700 and v<=900: exercito.append(diabetesPudim(6,0.5,350,3,'inimigo4.png'))
+                elif v>1000 and v<=1100: exercito.append(diabetesPudim(10,0.5,400,2,'inimigo5.png'))
+                elif v>1200 and v<=1600: exercito.append(diabetesPudim(13,0.8,650,1,'inimigo6.png'))
+                elif v>1700 and v<=1900: exercito.append(diabetesPudim(13,0.9,800,4,'inimigo7.png'))
+                elif v>2000 and v<=2200: exercito.append(diabetesPudim(15,0.99999,900,5,'inimigo8.png'))
+                elif v>2300 and v<=2500: exercito.append(diabetesPudim(15,0.9999999,1000,5,'caramelo.png'))
+                elif v>2600 and v<=2800: exercito.append(diabetesPudim(18,0.999999999,1500,4,'caramelo.png'))
+                elif v>2900 and v<=3100: exercito.append(diabetesPudim(18,0.99999999999,2000,2,'caramelo.png'))
+                elif v>3200 and v<=3400: exercito.append(diabetesPudim(10,0.999999999999,3000,1,'caramelo.png'))
+                elif v>3600 and v<=4700: exercito.append(diabetesPudim(25,1.2,1900,15,'pudim.png'))
+                elif v>4800 and v<=4900: exercito.append(diabetesPudim(35,1.5,50000,25,'pudim.png'))
+                elif v>5000 and v<=5100: exercito.append(diabetesPudim(50,1.8,100000,30,'pudim.png'))
+                elif v==5200: exercito.append(diabetesPudim(50,2,100000,30,'pudim.png'))
                 d=0
+            x=0
             for proteina in exercito:
                 try:
+                    if proteina.imagem=='':
+                        x+=1
                     for torre in pancreas:
-                        if int(proteina.quadrado.y/40)<int(torre.quadrado.y/40)+torre.alcance and int(proteina.quadrado.y/40)>int(torre.quadrado.y/40)-torre.alcance and int(proteina.quadrado.x/40)<int(torre.quadrado.x/40)+torre.alcance and int(proteina.quadrado.x/40)>int(torre.quadrado.x/40)-torre.alcance:
+                        if int(proteina.y/40)<int(torre.quadrado.y/40)+torre.alcance and int(proteina.y/40)>int(torre.quadrado.y/40)-torre.alcance and int(proteina.x/40)<int(torre.quadrado.x/40)+torre.alcance and int(proteina.x/40)>int(torre.quadrado.x/40)-torre.alcance:
                             if torre.ataque>proteina.defesa: proteina.vida_atual-=torre.ataque+proteina.defesa
                     if proteina.movimento==proteina.velocidade:
                         proteina.movimento=0
                         if proteina.direita==True:
-                            if caminho_tortuoso[int(proteina.quadrado.y/40)][int(proteina.quadrado.x/40)+proteina.padrao]==False:
-                                proteina.quadrado.x+=40
+                            if caminho_tortuoso[int(proteina.y/40)][int(proteina.x/40)+proteina.padrao]==False:
+                                proteina.x+=40
                             else:
                                 proteina.direita=False
                         elif proteina.desce==True:
-                            if caminho_tortuoso[int(proteina.quadrado.y/40)+proteina.padrao][int(proteina.quadrado.x/40)]==False:
-                                proteina.quadrado.y+=40
+                            if caminho_tortuoso[int(proteina.y/40)+proteina.padrao][int(proteina.x/40)]==False:
+                                proteina.y+=40
                             else:
                                 proteina.desce=False
                                 proteina.direita=True
                         else:
-                            if caminho_tortuoso[int(proteina.quadrado.y/40)-3+proteina.padrao][int(proteina.quadrado.x/40)]==False:
-                                proteina.quadrado.y-=40
+                            if caminho_tortuoso[int(proteina.y/40)-3+proteina.padrao][int(proteina.x/40)]==False:
+                                proteina.y-=40
                             else:
                                 proteina.desce=True
                                 proteina.direita=True
                     else:
                         proteina.movimento+=1
-                    if proteina.vida_atual<=0:
-                        atp_grana+=int(proteina.ataque/3+0.5)+random.randrange(int(proteina.ataque/3+0.5))+1
-                        proteina.quadrado=[]
-                        proteina=''
-                    if int(proteina.quadrado.y/40)==15-proteina.padrao and int(proteina.quadrado.x/40)>=17:
+                    if proteina.vida_atual<=0 and proteina.movimento<1000:
+                        #atp_grana+=proteina.ataque+random.randrange(int((proteina.ataque/3)+0.5))+1
+                        atp_grana+=1+int(1.5*proteina.ataque)+random.randrange(proteina.ataque)
+                        proteina.y=-1
+                        proteina.x=-1
+                        proteina.movimento=1000
+                        proteina.imagem=''
+                    if int(proteina.y/40)==15-proteina.padrao and int(proteina.x/40)>=17:
                         vida_pancreas-=proteina.ataque
-                        proteina.quadrado=[]
-                        proteina=''
+                        proteina.y=-1
+                        proteina.x=-1
+                        proteina.movimento=1000
+                        proteina.imagem=''
                 except:
                     pass
             if andar_esquerda and retangulo.x>0:
@@ -303,13 +418,14 @@ while rodando:
 #            DISPLAY.fill(torre.cor,torre.quadrado)
         for proteina in exercito:
             try:
-                DISPLAY.fill(proteina.cor,proteina.quadrado)
+                DISPLAY.blit(proteina.imagem,(proteina.x,proteina.y))
+#                DISPLAY.fill(proteina.cor,proteina.quadrado)
                 if proteina.vida_total<1000:
-                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.quadrado.x,proteina.quadrado.y+proteina.quadrado.width,int(proteina.vida_total/10),5))
-                    DISPLAY.fill((255,0,0),pygame.Rect(proteina.quadrado.x+1,proteina.quadrado.y+proteina.quadrado.width+1,int(proteina.vida_atual/10),3))
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/10),5))
+                    DISPLAY.fill((255,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/10),3))
                 else:
-                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.quadrado.x,proteina.quadrado.y+proteina.quadrado.width,int(proteina.vida_total/10000),5))
-                    DISPLAY.fill((255,0,0),pygame.Rect(proteina.quadrado.x+1,proteina.quadrado.y+proteina.quadrado.width+1,int(proteina.vida_atual/10000),3))
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/10000),5))
+                    DISPLAY.fill((random.randrange(100)+156,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/10000),3))
             except:
                 pass
         DISPLAY.fill((255,255,255),retangulo)
@@ -321,9 +437,12 @@ while rodando:
         DISPLAY.fill((0,255,0),pygame.Rect(20,590,int(atp_grana/5),5))
         DISPLAY.blit(pygame.font.SysFont("arial", 10).render("VIDA",True,(0,0,0)),(0,580))
         DISPLAY.blit(pygame.font.SysFont("arial", 10).render("ATP",True,(0,0,0)),(0,590))
+        if x==0 and v>5200:
+            DISPLAY.fill((255,255,255),pygame.Rect(35,280,733,80))
+            DISPLAY.blit(pygame.font.SysFont("arial", 80).render("PARABÉNS, VENCEDOR!",True,(random.randrange(256),random.randrange(256),random.randrange(256))),(35,280))
         if v>=10 and v<=40:
-            DISPLAY.fill((255,255,255),pygame.Rect(35,10*v,733,40))
-            DISPLAY.blit(pygame.font.SysFont("arial", 40).render("PREPARE-SE! A PRIMEIRA ONDA ESTÁ VINDO!",True,(random.randrange(256),random.randrange(256),random.randrange(256))),(35,10*v))
+            DISPLAY.fill((255,250,250),pygame.Rect(35,10*v+10,733,40))
+            DISPLAY.blit(pygame.font.SysFont("arial", 40).render("PREPARE-SE! A PRIMEIRA ONDA ESTÁ VINDO!",True,(random.randrange(256),random.randrange(256),random.randrange(256))),(35,10*v+10))
         if abrir_menu:
             DISPLAY.fill((255,200,200),pygame.Rect(275,200,250,200))
             DISPLAY.fill((200,20,20),pygame.Rect(300,225,200,150))
@@ -353,10 +472,11 @@ while rodando:
         else:
             d+=1
             v+=1
+        pygame.display.set_icon(pygame.image.load('torre3.png'))
         pygame.display.set_caption('PANCREAS - TOWER DEFENSE (by:Pudim Games)')
         pygame.mouse.set_visible(0)
         pygame.display.update()
-        if abrir_menu:
+        if abrir_menu or x>0 and v>5200:
             fpsClock.tick(60)
         else:
             fpsClock.tick(FPS)
