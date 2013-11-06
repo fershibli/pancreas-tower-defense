@@ -32,6 +32,10 @@ caminho_tortuoso=[[True,False,False,True,True,True,True,True,True,True,True,True
                   [True,False,False,False,False,False,False,True,True,False,False,False,False,False,False,True,True,False,False,True],
                   [True,True,True,True,True,True,True,True,True,False,False,False,False,False,False,True,True,False,False,True],
                   [False,False,False,False,False,False,False,False,True,True,True,True,True,True,True,True,True,False,False,True]]
+def maiorQuezeroINT(numero):
+    if numero<0: numero=0
+    else: numero=int(numero)
+    return numero
 y=1
 while y<600:
     x=1
@@ -165,7 +169,7 @@ while rodando:
             DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Os açúcares, carboidratos e proteínas avançarão pela parte mais baixa.",True,(0,0,0)),(0,255))
             DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Destrua-as e obtenha ATP antes que eles sobrecarreguem o órgão.",True,(0,0,0)),(0,335))
             DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Posicione suas torres de defesa celular nas partes mais altas.",True,(0,0,0)),(0,415))
-            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("O ATP obtido pode ser usado para contruir mais e mais torres!",True,(0,0,0)),(0,495))
+            DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("O ATP obtido pode ser usado para construir mais e mais torres!",True,(0,0,0)),(0,495))
         if vida_pancreas==1003:
             DISPLAY.blit((pygame.image.load('pudim_games.jpg')),(150,350))
             DISPLAY.blit(pygame.font.SysFont("arial black", 20).render("Produtora:",True,(0,0,0)),(300,235))
@@ -289,11 +293,8 @@ while rodando:
                 elif v>5000 and v<=5100: exercito.append(diabetesPudim(50,1.8,100000,30,'pudim.png'))
                 elif v==5200: exercito.append(diabetesPudim(50,2,100000,30,'pudim.png'))
                 d=0
-            x=0
             for proteina in exercito:
                 try:
-                    if proteina.imagem=='':
-                        x+=1
                     for torre in pancreas:
                         if int(proteina.y/40)<int(torre.quadrado.y/40)+torre.alcance and int(proteina.y/40)>int(torre.quadrado.y/40)-torre.alcance and int(proteina.x/40)<int(torre.quadrado.x/40)+torre.alcance and int(proteina.x/40)>int(torre.quadrado.x/40)-torre.alcance:
                             if torre.ataque>proteina.defesa: proteina.vida_atual-=torre.ataque+proteina.defesa
@@ -420,12 +421,21 @@ while rodando:
             try:
                 DISPLAY.blit(proteina.imagem,(proteina.x,proteina.y))
 #                DISPLAY.fill(proteina.cor,proteina.quadrado)
-                if proteina.vida_total<1000:
+                if proteina.vida_total<500:
                     DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/10),5))
                     DISPLAY.fill((255,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/10),3))
+                elif proteina.vida_total<1000:
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/20),5))
+                    DISPLAY.fill((200,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/20),3))
+                elif proteina.vida_total<10000:
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/200),5))
+                    DISPLAY.fill((100,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/200),3))
+                elif proteina.vida_total<=100000:
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/2000),5))
+                    DISPLAY.fill((55,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/2000),3))
                 else:
-                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/10000),5))
-                    DISPLAY.fill((random.randrange(100)+156,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/10000),3))
+                    DISPLAY.fill((255,255,255),pygame.Rect(proteina.x,proteina.y+40,int(proteina.vida_total/100000),5))
+                    DISPLAY.fill((0,0,0),pygame.Rect(proteina.x+1,proteina.y+40+1,int(proteina.vida_atual/100000),3))
             except:
                 pass
         DISPLAY.fill((255,255,255),retangulo)
@@ -437,9 +447,12 @@ while rodando:
         DISPLAY.fill((0,255,0),pygame.Rect(20,590,int(atp_grana/5),5))
         DISPLAY.blit(pygame.font.SysFont("arial", 10).render("VIDA",True,(0,0,0)),(0,580))
         DISPLAY.blit(pygame.font.SysFont("arial", 10).render("ATP",True,(0,0,0)),(0,590))
-        if x==0 and v>5200:
-            DISPLAY.fill((255,255,255),pygame.Rect(35,280,733,80))
-            DISPLAY.blit(pygame.font.SysFont("arial", 80).render("PARABÉNS, VENCEDOR!",True,(random.randrange(256),random.randrange(256),random.randrange(256))),(35,280))
+        vitoria_verifica=0
+        for proteina in exercito:
+            if proteina.imagem!='': vitoria_verifica+=maiorQuezeroINT(proteina.vida_atual)
+        if vitoria_verifica<=0 and v>5200:
+            DISPLAY.fill((255,255,255),pygame.Rect(0,280,800,80))
+            DISPLAY.blit(pygame.font.SysFont("arial", 80).render("PARABÉNS, VENCEDOR!",True,(255,100,100)),(10,280))
         if v>=10 and v<=40:
             DISPLAY.fill((255,250,250),pygame.Rect(35,10*v+10,733,40))
             DISPLAY.blit(pygame.font.SysFont("arial", 40).render("PREPARE-SE! A PRIMEIRA ONDA ESTÁ VINDO!",True,(random.randrange(256),random.randrange(256),random.randrange(256))),(35,10*v+10))
