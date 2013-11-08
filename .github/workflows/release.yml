@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  NAME: PancreasTowerDefense
+  MAIN: pancreas_defense.py
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux }
+          - { os: windows-latest, platform: windows }
+          - { os: macos-latest, platform: macos }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build
+        shell: bash
+        env:
+          PY: python
+          DEPS: "pyinstaller pygame"
+        run: bash .github/scripts/build.sh ${{ matrix.platform }}
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.platform }}
+          path: dist/*.zip
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/') }}
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
