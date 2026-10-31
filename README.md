@@ -20,6 +20,6 @@ The web version runs the game with pygbag (CPython + pygame-ce compiled to WebAs
 
 ## Releases
 
-Builds are made by GitHub Actions (`.github/workflows/release.yml`) for macOS, Windows and Linux (Python 3.12 + pygame). Push a tag such as `v1.0` (or run the workflow by hand) and the zipped builds are attached to a GitHub release.
+Builds are made by GitHub Actions (`.github/workflows/release.yml`) for macOS, Windows and Linux (Python 3.12 + pygame). The macOS build is made on an Intel runner (`macos-15-intel`), so it runs on Intel Macs. Push a tag such as `v1.0` (or run the workflow by hand) and the zipped builds are attached to a GitHub release.
 
 To play from source: `python3 pancreas_defense.py`.
